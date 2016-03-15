@@ -31,11 +31,32 @@ app.get('/', function(req,res) {
 	res.render('index.html');
 });
 
-app.get("/login", function(req,res)
+app.put("/login", function(req,res)
 {
-	console.log("logged in");
-	req.session.user = "Wombat";
-	res.render("index.html");
+	console.log("logging in");
+	console.log(req.body.username);
+	console.log(req.body.password);
+	conn.query("SELECT id FROM user WHERE username like '"+req.body.username+"' and password like '"+req.body.password+"'", function(err,rows,fields)
+	 {
+			if (err)
+			{
+					console.log("no user found");
+					console.log(err);
+			}
+			else
+			{
+				console.log("logged in successfully");
+				console.log(rows[0].id);
+				req.session.user = rows[0].id;
+				res.send({id:rows[0].id});
+				// res.send({test:"test"});
+				// res.render("index.html");
+				// res.send({data : rows});
+				// console.log({data : rows});
+				// res.send(rows);
+				// console.log(rows);
+			}
+	});
 });
 
 app.get("/logout", function(req,res)
@@ -116,18 +137,33 @@ app.get('/data', function(req,res) {
 
 conn.connect();
 
-app.get('/getAll', function(req,res) {
-    conn.query('SELECT * FROM to_do', function(err,rows,fields) {
-        if (err) {
-            console.log("Something is amiss...");
-            console.log(err);
-        } else {
-            // res.send({data : rows});
-            // console.log({data : rows});
-            res.send(rows);
-            console.log(rows);
-        }
-    });
+app.get('/getAll', function(req,res)
+{
+
+	console.log(req.session.user);
+	console.log(req.session.user.id);
+	if (req.session.user)
+	{
+		conn.query("SELECT * FROM to_do WHERE user_id ='"+req.session.user+"'", function(err,rows,fields)
+		{
+			if (err)
+			{
+				console.log("Something is amiss...");
+				console.log(err);
+			}
+			else
+			{
+				// res.send({data : rows});
+				// console.log({data : rows});
+				// if (req.session.user)
+				// {
+				// 	req.session.user.id;
+				// }
+				res.send(rows);
+				console.log(rows);
+			}
+		});
+	}
 });
 
 app.post('/send', function(req,res) {
@@ -156,7 +192,7 @@ app.delete('/del/:id', function(req, res)
 app.post('/add', function(req, res)
 {
   console.log("in app.post/add");
-  conn.query("INSERT INTO to_do (item) VALUES ('"+req.body.item+"')");
+  conn.query("INSERT INTO to_do (item, user_id) VALUES ('"+req.body.item+"',"+req.session.user+")");
 });
 
 app.get('/hello', function(req,res) {

@@ -7,7 +7,23 @@ window.onload = function()
     checkAndRemove();
     getData("/getAll");
   });
-
+  loginForm.submit.addEventListener("click", function(e)
+  {
+    e.preventDefault();
+    var username = loginForm.username.value;
+    var password = loginForm.password.value;
+    var obj = {username:username, password:password};
+    verbData("PUT", "/login", undefined, obj);
+  });
+  logout.addEventListener("click", function()
+  {
+    // logout = document.getElementById("logout");
+    // if(logout)
+    // {
+    //   logout.parentNode.removeChild(logout);
+    // }
+    getData("/logout");
+  });
   // var item = document.addForm.addItem.value;
   // var obj = {"buyer":buyer, "item":item, "tracking":tracking};
   // updateData("POST", "rest/data", obj);
@@ -33,7 +49,10 @@ window.onload = function()
 
 var body = document.querySelector("body");
 var selectDiv = document.getElementById("selectDiv");
+var buttonsDiv = document.getElementById("buttonsDiv");
 var id;
+var logout = document.getElementById("logout");
+var loginForm = document.loginForm;
 
 function checkAndRemove()
 {
@@ -219,15 +238,18 @@ function verbData(method, url, callback, obj) {
   xhr.onreadystatechange = function() {
 		if (xhr.status < 400 && xhr.readyState == 4) {
 			console.log(xhr.responseText);
-			if (callback) {
+			if (callback)
+      {
 				callback(JSON.parse(xhr.responseText).data);
 			}
+      var id = xhr.responseText;
 		}
 	};
 
 	if (obj) {
     console.log("object");
 		xhr.send(JSON.stringify(obj));
+		// xhr.send(obj);
 	} else {
     console.log("NO object");
 		xhr.send(null);
