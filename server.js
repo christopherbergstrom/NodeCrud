@@ -195,6 +195,12 @@ app.post('/add', function(req, res)
   conn.query("INSERT INTO to_do (item, user_id) VALUES ('"+req.body.item+"',"+req.session.user+")");
 });
 
+app.post('/signup', function(req, res)
+{
+  console.log("in app.post/signup");
+  conn.query("INSERT INTO user (username, password) VALUES ('"+req.body.username+"','"+req.body.password+"')");
+});
+
 app.get('/hello', function(req,res) {
 	res.send('Hello world');
 });

@@ -15,6 +15,14 @@ window.onload = function()
     var obj = {username:username, password:password};
     verbData("PUT", "/login", undefined, obj);
   });
+  signupForm.submit.addEventListener("click", function(e)
+  {
+    e.preventDefault();
+    var username = signupForm.username.value;
+    var password = signupForm.password.value;
+    var obj = {username:username, password:password};
+    verbData("POST", "/signup", undefined, obj);
+  });
   logout.addEventListener("click", function()
   {
     // logout = document.getElementById("logout");
@@ -53,6 +61,7 @@ var buttonsDiv = document.getElementById("buttonsDiv");
 var id;
 var logout = document.getElementById("logout");
 var loginForm = document.loginForm;
+var signupForm = document.signupForm;
 
 function checkAndRemove()
 {
