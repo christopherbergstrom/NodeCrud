@@ -3,6 +3,12 @@ var app = express();
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var credentials = require('./credentials.js');
+var session = require("express-session");
+app.use(session({
+	resave : false,
+	saveUninitialized : false,
+	secret : credentials.cookieSecret
+}));
 app.use(cookieParser(credentials.cookieSecret));
 
 var mysql = require('mysql');
@@ -23,6 +29,47 @@ app.set("view engine", "html");
 
 app.get('/', function(req,res) {
 	res.render('index.html');
+});
+
+app.get("/login", function(req,res)
+{
+	console.log("logged in");
+	req.session.user = "Wombat";
+	res.render("index.html");
+});
+
+app.get("/logout", function(req,res)
+{
+	console.log("logged out");
+	req.session.user = null;
+	res.render("index.html");
+});
+
+app.use(session({
+	resave : false,
+	saveUninitialized : false,
+	secret : credentials.cookieSecret,
+	key : "user"
+}));
+
+app.get("/removeSession", function(req,res)
+{
+	console.log("removing session");
+	delete req.session.user;
+	res.render("index.html");
+});
+
+app.get("/newError", function(req,res)
+{
+	req.session.flash = "Some error!";
+	res.render("index.html");
+});
+
+app.get("/error", function(req,res)
+{
+	res.locals.flash = req.session.flash;
+	delete req.session.flash;
+	res.render("index.html");
 });
 
 app.get("/signed", function(req,res)
